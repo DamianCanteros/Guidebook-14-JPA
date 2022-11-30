@@ -24,12 +24,14 @@ public class EditorialServicio {
         System.out.println("ingrese el nombre");
         String nombre = read.next();
         try{
-            if (buscarNombre(nombre) == null) {
+            if (buscarNombre(nombre).isEmpty()) {
                 Editorial e = new Editorial(nombre,true);
                 em.getTransaction().begin();
                 em.persist(e);
                 em.getTransaction().commit();
-            }
+                System.out.println("Carga exitosa");
+            }else
+                System.out.println("La editorial ingresada ya existe");
         }catch(Exception e){
             throw e;
         }
@@ -47,7 +49,8 @@ public class EditorialServicio {
                 em.merge(e);
                 em.getTransaction().commit();
                 System.out.println("Modificacion exitosa");
-            }
+            }else
+                System.out.println("No se encontro la editorial");
         }catch(Exception ex){
             throw ex;
         }
@@ -63,7 +66,8 @@ public class EditorialServicio {
                 em.remove(e);
                 em.getTransaction().commit();
                 System.out.println("Libro borrado con exito");
-            }
+            }else
+                System.out.println("No se encontro la editorial");
         }catch(Exception ex){
             throw ex;
         }
@@ -88,4 +92,14 @@ public class EditorialServicio {
             throw e;
         }
     }
+    
+    public void showquery(List<Editorial> editoriales) throws Exception{
+        System.out.println("\nEDITORIALES");
+        System.out.println("__________________________");
+        System.out.printf("|%-3s|%-13s|%-7s|\n", "ID", "NOMBRE", "ALTA", "");
+        for (Editorial aux : editoriales) {
+            System.out.printf("|%-3s|%-13s|%-7s|\n", aux.getId(), aux.getNombre(), "");
+        }
+        System.out.println("__________________________");
+    } 
 }

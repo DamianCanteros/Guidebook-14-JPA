@@ -19,8 +19,7 @@ public class LibroServicio {
     EditorialServicio es = new EditorialServicio();
     Scanner read = new Scanner(System.in);
     List<Libro> libros = new ArrayList();
-    EntityManager em = Persistence.createEntityManagerFactory("LibreriaPU")
-            .createEntityManager();
+    EntityManager em = Persistence.createEntityManagerFactory("LibreriaPU").createEntityManager();
             
     public void crearLibro(){
         
@@ -40,27 +39,27 @@ public class LibroServicio {
                 em.getTransaction().begin();
                 em.persist(l);
                 em.getTransaction().commit();
-                System.out.println("Libro cargado con exito");
-            }
+                System.out.println("Carga exitosa");
+            }else
+                System.out.println("El libro ingresado ya existe");
         }catch(Exception e){
             throw e;
         }
     }
     
-    public void modificarLibro(){
+    public void modificarLibro(Long isbn, int prestados){
             
-        System.out.println("ingrese el ISBN del libro a modificar");
-        Libro l = buscarIsbn(read.nextLong());
+        Libro l = buscarIsbn(isbn);
         try{
             if (l != null) {
-                System.out.println("ingrese la cantidad ejemplares prestados");
-                l.setEjemplaresPrestados(read.nextInt());
+                l.setEjemplaresPrestados(prestados);
                 l.setEjemplaresRestantes(l.getEjemplares() - l.getEjemplaresPrestados());
                 em.getTransaction().begin();
                 em.merge(l);
                 em.getTransaction().commit();
                 System.out.println("Modificacion exitosa");
-            }
+            }else
+                System.out.println("No se encontro el libro");
         }catch(Exception e){
             throw e;
         }
@@ -76,14 +75,15 @@ public class LibroServicio {
                 em.remove(l);
                 em.getTransaction().commit();
                 System.out.println("Libro borrado con exito");
-            }
+            }else
+                System.out.println("No se encontro el libro");
         }catch(Exception e){
             throw e;
         }
     }
     
     public Libro buscarIsbn(Long isbn){
-            
+
         try{
             Libro l = new Libro();
             return l = em.find(Libro.class, isbn);       
@@ -93,7 +93,7 @@ public class LibroServicio {
     }
 
     public List buscarTitulo(String titulo){
-            
+
         try{
             return libros = em.createQuery("SELECT l FROM Libro l WHERE l.titulo LIKE :titulo")
                     .setParameter("titulo",titulo).getResultList();
@@ -103,9 +103,9 @@ public class LibroServicio {
     }
     
     public List buscarAutor(String autor){
-            
+
         try{
-            return libros = em.createQuery("SELECT l FROM Libro l JOIN Autor a WHERE a.nombre LIKE :nombre")
+            return libros = em.createQuery("SELECT l FROM Libro l JOIN l.autor a WHERE a.nombre LIKE :nombre")
                     .setParameter("nombre",autor).getResultList();
         }catch(Exception e){
             throw e;
@@ -113,13 +113,22 @@ public class LibroServicio {
     }
     
     public List buscarEditorial(String editorial){
-            
+
         try{
-            return libros = em.createQuery("SELECT l FROM Libro l JOIN Editorial e WHERE e.nombre LIKE :nombre")
+            return libros = em.createQuery("SELECT l FROM Libro l JOIN l.editorial e WHERE e.nombre LIKE :nombre")
                     .setParameter("nombre",editorial).getResultList();
         }catch(Exception e){
             throw e;
         }
     }
-    
+    public void showquery(List<Libro> libros) throws Exception{
+        System.out.println("\nLIBROS");
+        System.out.println("__________________________________________________________________________________________________________________________________");
+        System.out.printf("|%-20s|%-20s|%-7s|%-13s|%-13s|%-13s|%-7s|%-13s|%-13s|\n", "ISBN", "TITULO", "AÑO", "EJEMPLARES", "PRESTADOS", "RESTANTES", "ALTA", "AUTOR", "EDITORIAL", "");
+        for (Libro aux : libros) {
+            System.out.printf("|%-20s|%-20s|%-7s|%-13s|%-13s|%-13s|%-7s|%-13s|%-13s|\n",
+            aux.getIsbn(), aux.getTitulo(), aux.getAnio(), aux.getEjemplares(), aux.getEjemplaresPrestados(), aux.getEjemplaresRestantes(), aux.getAlta(), aux.getAutor().getNombre(), aux.getEditorial().getNombre(), "");
+        }
+        System.out.println("__________________________________________________________________________________________________________________________________");
+    }   
 }

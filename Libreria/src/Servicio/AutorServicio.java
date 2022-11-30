@@ -23,12 +23,14 @@ public class AutorServicio {
         System.out.println("ingrese el nombre");
         String nombre = read.next();
         try{
-            if (buscarNombre(nombre) == null) {
+            if (buscarNombre(nombre).isEmpty()) {
                 Autor a = new Autor(nombre,true);
                 em.getTransaction().begin();
                 em.persist(a);
                 em.getTransaction().commit();
-            }
+                System.out.println("Carga exitosa");
+            }else
+                System.out.println("El autor ingresado ya existe");
         }catch(Exception e){
             throw e;
         }
@@ -46,7 +48,8 @@ public class AutorServicio {
                 em.merge(a);
                 em.getTransaction().commit();
                 System.out.println("Modificacion exitosa");
-            }
+            }else
+                System.out.println("No se encontro el autor");
         }catch(Exception e){
             throw e;
         }
@@ -62,7 +65,8 @@ public class AutorServicio {
                 em.remove(a);
                 em.getTransaction().commit();
                 System.out.println("Libro borrado con exito");
-            }
+            }else
+                System.out.println("No se encontro el autor");
         }catch(Exception e){
             throw e;
         }
@@ -79,7 +83,7 @@ public class AutorServicio {
     }
 
     public List buscarNombre(String nombre){
-            
+        
         try{
             return autores = em.createQuery("SELECT a FROM Autor a WHERE a.nombre LIKE :nombre")
                     .setParameter("nombre",nombre).getResultList();
@@ -87,4 +91,14 @@ public class AutorServicio {
             throw e;
         }
     }
+    
+    public void showquery(List<Autor> autores) throws Exception{
+        System.out.println("\nAUTORES");
+        System.out.println("__________________________");
+        System.out.printf("|%-3s|%-13s|%-7s|\n", "ID", "NOMBRE", "ALTA", "");
+        for (Autor aux : autores) {
+            System.out.printf("|%-3s|%-13s|%-7s|\n", aux.getId(), aux.getNombre(), "");
+        }
+        System.out.println("__________________________");
+    } 
 }
